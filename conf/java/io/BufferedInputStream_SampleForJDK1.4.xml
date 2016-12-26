@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<フィルタ>
+
+  <置換エントリ>
+    <前>Check to make sure that this stream has not been closed</前>
+    <後>なんたらかんたら</後>
+  </置換エントリ>
+
+  <置換エントリ>
+    <前>Fills the buffer with more data, taking into account
+     \* shuffling and other tricks for dealing with marks.
+     \* Assumes that it is being called by a synchronized method.
+     \* This method also assumes that all data has already been read in,
+     \* hence pos > count.</前>
+    <後>なんたらかんたら
+     \* なんたらかんたら
+     \* なんたらかんたら
+     \* なんたらかんたら
+     \* なんたらかんたら</後>
+  </置換エントリ>
+
+  <置換エントリ>
+    <前>no mark: throw away the buffer</前>
+    <後>なんたらかんたら</後>
+  </置換エントリ>
+
+  <置換エントリ>
+    <前>no room left in buffer</前>
+    <後>なんたらかんたら</後>
+  </置換エントリ>
+
+  <置換エントリ>
+    <前>can throw away early part of the buffer</前>
+    <後>なんたらかんたら</後>
+  </置換エントリ>
+
+  <置換エントリ>
+    <前>buffer got too big, invalidate mark</前>
+    <後>なんたらかんたら</後>
+  </置換エントリ>
+
+  <置換エントリ>
+    <前>drop buffer contents</前>
+    <後>なんたらかんたら</後>
+  </置換エントリ>
+
+  <置換エントリ>
+    <前>grow buffer</前>
+    <後>なんたらかんたら</後>
+  </置換エントリ>
+
+  <置換エントリ>
+    <前>Read characters into a portion of an array, reading from the underlying
+     * stream at most once if necessary.</前>
+    <後>なんたらかんたら
+     \* なんたらかんたら</後>
+  </置換エントリ>
+
+  <置換エントリ>
+    <前>If the requested length is at least as large as the buffer, and
+               if there is no mark/reset activity, do not bother to copy the
+               bytes into the local buffer.  In this way buffered streams will
+               cascade harmlessly.</前>
+    <後>なんたらかんたら
+               なんたらかんたら
+               なんたらかんたら
+               なんたらかんたら</後>
+  </置換エントリ>
+
+  <置換エントリ>
+    <前>If no mark position set then don't keep in buffer</前>
+    <後>なんたらかんたら</後>
+  </置換エントリ>
+
+  <置換エントリ>
+    <前>Fill in buffer to save bytes for reset</前>
+    <後>なんたらかんたら</後>
+  </置換エントリ>
+
+</フィルタ>

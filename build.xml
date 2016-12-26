@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project default="release">
+
+
+    <!-- ディレクトリ、ファイル名定義 -->
+    <property name="srcdir" value="./src" />
+    <property name="bindir" value="./bin" />
+    <property name="libdir" value="./lib" />
+    <property name="dstdir" value="." />
+    <property name="jarfile" value="${dstdir}/mergedoc.jar" />
+    <property name="zipfile" value="${dstdir}/mergedoc.zip" />
+
+    <path id="class.path">
+        <fileset dir="${libdir}" includes="**/*.jar" />
+    </path>
+
+
+    <!-- リリース作成 -->
+    <target name="release">
+
+        <!-- フルビルド -->
+        <delete dir="${bindir}" />
+        <mkdir dir="${bindir}" />
+        <javac srcdir="${srcdir}"
+               destdir="${bindir}"
+               classpathref="class.path"
+               encoding="UTF-8"
+               debug="on" />
+
+        <!-- 実行 JAR 作成 -->
+        <jar destfile="${jarfile}" basedir="${bindir}">
+            <manifest>
+                <attribute name="Main-Class" value="mergedoc.Application" />
+                <attribute name="Class-Path"
+                           value="./conf/ ./lib/ant.jar ./lib/commons-logging.jar ./lib/log4j-1.2.9.jar" />
+            </manifest>
+        </jar>
+
+        <!-- リリース ZIP 作成 -->
+        <delete file="${zipfile}" />
+        <zip destfile="${zipfile}"
+             basedir="${dstdir}"
+             excludes="**/mergedoc.properties" />
+
+    </target>
+
+
+</project>
