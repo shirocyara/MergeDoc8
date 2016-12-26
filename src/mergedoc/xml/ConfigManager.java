@@ -22,116 +22,126 @@ import mergedoc.core.FastStringUtils;
 
 /**
  * コンフィグマネージャです。
+ * 
  * @author Shinji Kashihara
  */
 public class ConfigManager {
 
-    /** このクラスのインスタンス */
-    private static ConfigManager configManager;
+	/** このクラスのインスタンス */
+	private static ConfigManager configManager;
 
-    /** SAX パーサ */
-    private final SAXParser saxParser;
+	/** SAX パーサ */
+	private final SAXParser saxParser;
 
-    /** コンフィグルートパス */
-    private final File configRoot;
-    
-    /** global.xml ファイル */
-    private final File globalXML;
+	/** コンフィグルートパス */
+	private final File configRoot;
 
-    /**
-     * コンストラクタです。
-     * @throws MergeDocException SAX パーサの生成に失敗した場合
-     */
-    private ConfigManager() throws MergeDocException {
+	/** global.xml ファイル */
+	private final File globalXML;
 
-        try {
-            saxParser = SAXParserFactory.newInstance().newSAXParser();
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new MergeDocException("SAX パーサの生成に失敗しました。\n" + e);
-        }
+	/**
+	 * コンストラクタです。
+	 * 
+	 * @throws MergeDocException
+	 *             SAX パーサの生成に失敗した場合
+	 */
+	private ConfigManager() throws MergeDocException {
 
-        String globalXMLName = "/global.xml";
-        URL url = getClass().getResource(globalXMLName);
-        if (url == null) {
-            throw new MergeDocException(globalXMLName + " が見つかりません。");
-        } 
-        globalXML = new File(url.getPath());
-        
-        String parent = null;
-        try {
-        	// 空白やマルチバイト文字ディレクトリの対応
-            parent = URLDecoder.decode(globalXML.getParent(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-        }
-        configRoot = new File(parent);
-    }
-    
-    /**
-     * このクラスのシングルトンインスタンスを取得します。
-     * 生成時の同期化は行われません。
-     * @return このクラスのインスタンス
-     * @throws MergeDocException SAX パーサの生成に失敗した場合
-     */
-    public static ConfigManager getInstance() throws MergeDocException {
-        if (configManager == null) {
-            configManager = new ConfigManager();
-        }
-        return configManager;
-    }
+		try {
+			saxParser = SAXParserFactory.newInstance().newSAXParser();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new MergeDocException("SAX パーサの生成に失敗しました。\n" + e);
+		}
 
-    /**
-     * SAX パーサを取得します。
-     * @return SAX パーサ
-     */
-    public SAXParser getSAXPerser() {
-        return saxParser;
-    }
-    
-    /**
-     * コンフィグルートの子相対パスを指定してファイルを取得します。
-     * @param path コンフィグルートの子相対パス
-     * @return ファイル
-     */
-    public File getFile(String path) {
-        return new File(configRoot, path);
-    }
-    
-    /**
-     * グローバル定義 XML の置換エントリリストを取得します。
-     * @return グローバル定義 XML の置換エントリリスト
-     * @throws MergeDocException 取得出来なかった場合
-     */
-    public List<ReplaceEntry> getGlobalEntries() throws MergeDocException {
-        ListingHandler handler = new ListingHandler();
-        try {
-            saxParser.parse(globalXML, handler);
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new MergeDocException(
-                globalXML.getName() + " のパースに失敗しました。\n" + e);
-        }
-        return handler.getReplaceEntries();
-    }
-    
-    /**
-     * プレビューテンプレートとなる文字列を取得します。
-     * @return プレビューテンプレート文字列
-     * @throws MergeDocException 取得出来なかった場合
-     */
-    public String getPrevewTemplate() throws MergeDocException {
-        File file = getFile("preview.tpl");
-        String template = null;
-        try {
-            InputStream is = new FileInputStream(file);
-            byte[] buf = new byte[is.available()];
-            is.read(buf);
-            is.close();
-            template = new String(buf, "UTF-8");
-        } catch (IOException e) {
-            throw new MergeDocException(file + " が見つかりません。");
-        }
-        template = FastStringUtils.optimizeLineSeparator(template);
-        return template;
-    }
+		String globalXMLName = "/global.xml";
+		URL url = getClass().getResource(globalXMLName);
+		if (url == null) {
+			throw new MergeDocException(globalXMLName + " が見つかりません。");
+		}
+		globalXML = new File(url.getPath());
+
+		String parent = null;
+		try {
+			// 空白やマルチバイト文字ディレクトリの対応
+			parent = URLDecoder.decode(globalXML.getParent(), "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+		}
+		configRoot = new File(parent);
+	}
+
+	/**
+	 * このクラスのシングルトンインスタンスを取得します。 生成時の同期化は行われません。
+	 * 
+	 * @return このクラスのインスタンス
+	 * @throws MergeDocException
+	 *             SAX パーサの生成に失敗した場合
+	 */
+	public static ConfigManager getInstance() throws MergeDocException {
+		if (configManager == null) {
+			configManager = new ConfigManager();
+		}
+		return configManager;
+	}
+
+	/**
+	 * SAX パーサを取得します。
+	 * 
+	 * @return SAX パーサ
+	 */
+	public SAXParser getSAXPerser() {
+		return saxParser;
+	}
+
+	/**
+	 * コンフィグルートの子相対パスを指定してファイルを取得します。
+	 * 
+	 * @param path
+	 *            コンフィグルートの子相対パス
+	 * @return ファイル
+	 */
+	public File getFile(String path) {
+		return new File(configRoot, path);
+	}
+
+	/**
+	 * グローバル定義 XML の置換エントリリストを取得します。
+	 * 
+	 * @return グローバル定義 XML の置換エントリリスト
+	 * @throws MergeDocException
+	 *             取得出来なかった場合
+	 */
+	public List<ReplaceEntry> getGlobalEntries() throws MergeDocException {
+		ListingHandler handler = new ListingHandler();
+		try {
+			saxParser.parse(globalXML, handler);
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new MergeDocException(globalXML.getName() + " のパースに失敗しました。\n" + e);
+		}
+		return handler.getReplaceEntries();
+	}
+
+	/**
+	 * プレビューテンプレートとなる文字列を取得します。
+	 * 
+	 * @return プレビューテンプレート文字列
+	 * @throws MergeDocException
+	 *             取得出来なかった場合
+	 */
+	public String getPrevewTemplate() throws MergeDocException {
+		File file = getFile("preview.tpl");
+		String template = null;
+		try {
+			InputStream is = new FileInputStream(file);
+			byte[] buf = new byte[is.available()];
+			is.read(buf);
+			is.close();
+			template = new String(buf, "UTF-8");
+		} catch (IOException e) {
+			throw new MergeDocException(file + " が見つかりません。");
+		}
+		template = FastStringUtils.optimizeLineSeparator(template);
+		return template;
+	}
 }

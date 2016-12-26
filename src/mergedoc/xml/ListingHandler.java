@@ -8,35 +8,38 @@ package mergedoc.xml;
 import java.util.LinkedList;
 import java.util.List;
 
-
 /**
  * 置換エントリのリストを作成するハンドラです。
+ * 
  * @author Shinji Kashihara
  */
 public class ListingHandler extends AbstractHandler {
 
-    /** 置換エントリのリスト */
-    private List<ReplaceEntry> replaceEntries = new LinkedList<ReplaceEntry>();
+	/** 置換エントリのリスト */
+	private List<ReplaceEntry> replaceEntries = new LinkedList<ReplaceEntry>();
 
-    /**
-     * コンストラクタです。
-     */
-    public ListingHandler() {
-    }
-    
-    /**
-     * 置換エントリを処理します。
-     * @param entry 置換エントリ
-     */
-    protected void handle(ReplaceEntry entry) {
-        replaceEntries.add(entry);
-    }
-    
-    /**
-     * 置換エントリのリストを取得します。
-     * @return 置換エントリのリスト
-     */
-    public List<ReplaceEntry> getReplaceEntries() {
-        return replaceEntries;
-    }
+	/**
+	 * コンストラクタです。
+	 */
+	public ListingHandler() {
+	}
+
+	/**
+	 * 置換エントリを処理します。
+	 * 
+	 * @param entry
+	 *            置換エントリ
+	 */
+	protected void handle(ReplaceEntry entry) {
+		replaceEntries.add(entry);
+	}
+
+	/**
+	 * 置換エントリのリストを取得します。
+	 * 
+	 * @return 置換エントリのリスト
+	 */
+	public List<ReplaceEntry> getReplaceEntries() {
+		return replaceEntries;
+	}
 }

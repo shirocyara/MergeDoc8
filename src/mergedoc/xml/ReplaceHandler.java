@@ -7,34 +7,40 @@ package mergedoc.xml;
 
 /**
  * ソース文字列の置換処理を行うハンドラです。
+ * 
  * @author Shinji Kashihara
  */
 public class ReplaceHandler extends AbstractHandler {
 
-    /** ソース文字列 */
-    private String source;
+	/** ソース文字列 */
+	private String source;
 
-    /**
-     * コンストラクタです。
-     * @param source ソース文字列
-     */
-    public ReplaceHandler(String source) {
-        this.source = source;
-    }
-    
-    /**
-     * 置換エントリを処理します。
-     * @param entry 置換エントリ
-     */
-    protected void handle(ReplaceEntry entry) {
-        source = entry.replace(source);
-    }
-    
-    /**
-     * 置換後のソース文字列を取得します。
-     * @return 置換後のソース文字列
-     */
-    public String getResult() {
-        return source;
-    }
+	/**
+	 * コンストラクタです。
+	 * 
+	 * @param source
+	 *            ソース文字列
+	 */
+	public ReplaceHandler(String source) {
+		this.source = source;
+	}
+
+	/**
+	 * 置換エントリを処理します。
+	 * 
+	 * @param entry
+	 *            置換エントリ
+	 */
+	protected void handle(ReplaceEntry entry) {
+		source = entry.replace(source);
+	}
+
+	/**
+	 * 置換後のソース文字列を取得します。
+	 * 
+	 * @return 置換後のソース文字列
+	 */
+	public String getResult() {
+		return source;
+	}
 }

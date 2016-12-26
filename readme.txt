@@ -1,8 +1,8 @@
-﻿MergeDoc 2
+﻿MergeDoc 8
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-実行環境: JRE5.0 以上
-URL： http://mergedoc.sourceforge.jp/
+実行環境: JRE8.0 以上
+URL： https://github.com/shirocyara/MergeDoc8
 
 Eclipse は日本語化しても Java 標準 API のメソッドなどにマウスを合わせたときにホ
 バー表示される説明は日本語化されません。これは Eclipse が JDK 付属の Java ソース

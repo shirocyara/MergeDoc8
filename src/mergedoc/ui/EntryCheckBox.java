@@ -11,27 +11,31 @@ import mergedoc.xml.ReplaceEntry;
 
 /**
  * 置換エントリを持つチェックボックスです。
+ * 
  * @author Shinji Kashihara
  */
 public class EntryCheckBox extends JCheckBox {
 
-    /** 置換エントリ */
-    private ReplaceEntry entry;
+	/** 置換エントリ */
+	private ReplaceEntry entry;
 
-    /**
-     * コンストラクタです。 
-     * @param entry 置換エントリ
-     */
-    public EntryCheckBox(ReplaceEntry entry) {
-        this.entry = entry;
-        setText(entry.getDescription());
-    }
-    
-    /**
-     * 置換エントリを取得します。
-     * @return 置換エントリ
-     */
-    public ReplaceEntry getReplaceEntry() {
-        return entry;
-    }
+	/**
+	 * コンストラクタです。
+	 * 
+	 * @param entry
+	 *            置換エントリ
+	 */
+	public EntryCheckBox(ReplaceEntry entry) {
+		this.entry = entry;
+		setText(entry.getDescription());
+	}
+
+	/**
+	 * 置換エントリを取得します。
+	 * 
+	 * @return 置換エントリ
+	 */
+	public ReplaceEntry getReplaceEntry() {
+		return entry;
+	}
 }

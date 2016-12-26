@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<configuration>
-	<appenders>
-		<Console name="STDERR">
+<Configuration status="off">
+	<!-- ログの出力先と出力フォーマットを設定する -->
+	<Appenders>
+		<Console name="STDERR" target="SYSTEM_ERR">
 			<PatternLayout pattern="%-5p %C{1} - %m%n" />
 		</Console>
-	</appenders>
-	
-	<loggers>
+	</Appenders>
+	<!-- パッケージごとにAppenderとログレベルを組み合わせる -->
+	<Loggers>
+		<Logger name="mergedoc" level="warn"/>
 		<root level="warn">
 			<appender-ref ref="STDERR" />
 		</root>
-	</loggers>
-</configuration>
+	</Loggers>
+</Configuration>

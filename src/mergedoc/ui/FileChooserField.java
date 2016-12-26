@@ -33,8 +33,8 @@ import javax.swing.SwingUtilities;
 import javax.swing.TransferHandler;
 import javax.swing.filechooser.FileFilter;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * ファイル選択フィールドです。
@@ -44,7 +44,7 @@ import org.apache.commons.logging.LogFactory;
 public class FileChooserField extends JPanel {
 
 	/** ロガー */
-	private static final Log log = LogFactory.getLog(FileChooserField.class);
+	private static final Logger logger = LogManager.getLogger(FileChooserField.class);
 
 	/** ラベル部 */
 	private final JLabel label = new JLabel();

@@ -27,8 +27,8 @@ import mergedoc.xml.ConfigManager;
 import mergedoc.xml.Persister;
 import mergedoc.xml.ReplaceEntry;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * 設定パネルです。
@@ -38,7 +38,7 @@ import org.apache.commons.logging.LogFactory;
 public class PreferencePanel extends JPanel {
 
 	/** ロガー */
-	private static final Log log = LogFactory.getLog(PreferencePanel.class);
+	private static final Logger logger = LogManager.getLogger(PreferencePanel.class);
 
 	/** 基本設定パネル：API ドキュメントディレクトリ ファイル選択フィールド */
 	private FileChooserField docField = new FileChooserField();

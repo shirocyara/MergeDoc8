@@ -14,8 +14,8 @@ import javax.swing.plaf.FontUIResource;
 
 import mergedoc.ui.MergeDocFrame;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
 
 /**
  * アプリケーション起動エントリです。
@@ -25,7 +25,7 @@ import org.apache.commons.logging.LogFactory;
 public class Application {
 
 	/** ロガー */
-	private static final Log log = LogFactory.getLog(Application.class);
+	private static final Logger logger = LogManager.getLogger(Application.class);
 
 	/**
 	 * メインです。
@@ -39,7 +39,7 @@ public class Application {
 		try {
 			initSystemLookAndFeel();
 		} catch (Exception e) {
-			log.warn("Look & Feel の設定に失敗しました。", e);
+			logger.warn("Look & Feel の設定に失敗しました。", e);
 		}
 
 		// フレーム生成
