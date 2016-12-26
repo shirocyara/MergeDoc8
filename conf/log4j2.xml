@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appenders>
+		<Console name="STDERR">
+			<PatternLayout pattern="%-5p %C{1} - %m%n" />
+		</Console>
+	</appenders>
+	
+	<loggers>
+		<root level="warn">
+			<appender-ref ref="STDERR" />
+		</root>
+	</loggers>
+</configuration>

@@ -33,7 +33,7 @@
             <manifest>
                 <attribute name="Main-Class" value="mergedoc.Application" />
                 <attribute name="Class-Path"
-                           value="./conf/ ./lib/ant.jar ./lib/commons-logging.jar ./lib/log4j-1.2.9.jar" />
+                	value="./conf/ ./lib/ant.jar ./lib/commons-logging-1.2.jar ./lib/log4j-1.2.9.jar" />
             </manifest>
         </jar>
 
