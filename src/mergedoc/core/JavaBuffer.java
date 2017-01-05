@@ -351,7 +351,7 @@ public class JavaBuffer {
 			}
 		}
 
-		logger.warn("インナークラス " + className + "#" + iClassName + " の終了位置が検出できませんでした。");
+		logger.warn("インナークラス " + className + "#" + iClassName + " の終了位置が検出できませんでした。\n" + currentToEnd);
 		return -1;
 	}
 
@@ -368,6 +368,10 @@ public class JavaBuffer {
 		if (comment == null)
 			return;
 		String srcComment = getSourceComment();
+		// inheritDocタグがあった場合は無視します。
+		if (srcComment.contains("{@inheritDoc}")){
+			return;
+		}
 		comment.setSourceBody(srcComment);
 		String docComment = comment.buildComment();
 

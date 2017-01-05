@@ -123,7 +123,7 @@ public class MergeDocFrame extends JFrame {
 		setTitle(SETTING_TITLE);
 		Persister psst = Persister.getInstance();
 		setLocation(psst.getInt(Persister.WINDOW_X, 0), psst.getInt(Persister.WINDOW_Y, 0));
-		setSize(psst.getInt(Persister.WINDOW_WIDTH, 700), psst.getInt(Persister.WINDOW_HEIGHT, 570));
+		setSize(psst.getInt(Persister.WINDOW_WIDTH, 710), psst.getInt(Persister.WINDOW_HEIGHT, 570));
 		int state = psst.getInt(Persister.WINDOW_STATE, NORMAL);
 		if ((state & Frame.ICONIFIED) != ICONIFIED) {
 			setExtendedState(state);

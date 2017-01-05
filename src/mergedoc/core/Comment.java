@@ -6,6 +6,7 @@
 package mergedoc.core;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -619,7 +620,6 @@ public class Comment {
 	 * @return サイズ調整済みのコメント（飾り付け含む）
 	 */
 	private String resizeComment(OutputComment o, String decoComment) {
-
 		// 作成したコメントが元ソースコメント行数より多い場合はコメントを小さくする
 		if (o.resultHeight() > o.originHeight) {
 			shrinkComment(o);
@@ -650,6 +650,71 @@ public class Comment {
 				o.rebuild();
 				if (o.resultHeight() > o.originHeight) {
 					shrinkComment(o);
+				}
+			}
+
+			// リンクタブを修正。
+			if (docBody != null && o.resultHeight() > o.originHeight) {
+				if (docBody.contains("{@link")) {
+					StringBuffer sb = new StringBuffer();
+					int cnt = docBody.indexOf("{@link ");
+					int end = -1;
+					while (cnt != -1) {
+						sb.append(docBody.substring(end + 1, cnt));
+						if (docBody.indexOf("}", cnt) == -1) {
+							break;
+						}
+						end = docBody.indexOf("}", cnt);
+						String tmp[] = docBody.substring(cnt, end).split(" ");
+						if (tmp.length == 3) {
+							if (tmp[1].contains(tmp[2])) {
+								if (tmp[1].startsWith("#" + tmp[2])) {
+									sb.append(tmp[0] + " #" + tmp[2] + "}");
+								} else {
+									sb.append(tmp[0] + " " + tmp[1] + "}");
+								}
+							} else {
+								sb.append(docBody.substring(cnt, end));
+							}
+						} else {
+							sb.append(docBody.substring(cnt, end));
+						}
+						cnt = docBody.indexOf("{@link ", cnt + 1);
+					}
+					if (end == -1) {
+						sb.append(docBody.substring(cnt));
+					} else {
+						sb.append(docBody.substring(end + 1));
+					}
+					docBody = sb.toString();
+
+					o.rebuild();
+					if (o.resultHeight() > o.originHeight) {
+						shrinkComment(o);
+					}
+				}
+			}
+
+			// 元 Java ソースのコメントから param タグの数を調整。
+			if (params != null && o.resultHeight() > o.originHeight) {
+				int cnt = srcBody.split("@param").length-1;
+				if (params.size() != cnt) {
+					Iterator<String> itr = params.iterator();
+					while(itr.hasNext()){
+						String param = itr.next();
+						String[] tmps = param.split(" ");
+						if (tmps.length <= 0) {
+							continue;
+						}
+						if (!srcBody.contains("@param " + tmps[0] + " ")) {
+							itr.remove();
+						}
+					}
+
+					o.rebuild();
+					if (o.resultHeight() > o.originHeight) {
+						shrinkComment(o);
+					}
 				}
 			}
 

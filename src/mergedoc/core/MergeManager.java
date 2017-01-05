@@ -227,6 +227,8 @@ public class MergeManager {
 				source = FastStringUtils.optimizeLineSeparator(source);
 				source = FastStringUtils.untabify(source);
 
+				source = chkFilter(entryName, source);
+
 				// Java ソースを API ドキュメントとマージ
 				String result = merger.merge(source);
 				String className = merger.getMergedClassName();
@@ -258,6 +260,41 @@ public class MergeManager {
 		for (int size = 0; (size = in.read(byteBuffer)) > 0;) {
 			out.write(byteBuffer, 0, size);
 		}
+	}
+
+	/**
+	 * XML に定義された置換エントリを元にソース置換処理を行います。
+	 * 
+	 * @param entryName
+	 *            Java ソースファイル名
+	 * @param source
+	 *            Java ソース文字列
+	 * @return 処理後のソース文字列
+	 * @throws MergeDocException
+	 *             コンフィグ情報の取得に失敗した場合
+	 * @throws SAXException
+	 *             SAX パース例外が発生した場合
+	 * @throws IOException
+	 *             入出力例外が発生した場合
+	 */
+	private String chkFilter(String entryName, String source) throws MergeDocException, SAXException, IOException {
+		// クラス別置換定義の処理
+		String path = entryName.substring(0, entryName.length() - 4) + "xml";
+		ConfigManager config = ConfigManager.getInstance();
+		File entryXML = config.getFile(path);
+		if (entryXML.exists()) {
+			SAXParser saxParser = config.getSAXPerser();
+			ReplaceHandler handler = new ReplaceHandler(source);
+			saxParser.parse(entryXML, handler);
+			source = handler.getResult();
+		}
+
+		// グローバル置換定義の処理
+		for (ReplaceEntry entry : pref.getGlobalEntries()) {
+			source = entry.replace(source);
+		}
+
+		return source;
 	}
 
 	/**

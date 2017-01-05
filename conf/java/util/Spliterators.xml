@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE root SYSTEM "../../filter.dtd">
+<filter>
+
+  <entry>
+    <input>{@link java.util.Collection#iterator())</input>
+    <replacement>{@link java.util.Collection#iterator()}</replacement>
+  </entry>
+
+  <entry>
+    <input>{@link java.util.Collection#size())</input>
+    <replacement>{@link java.util.Collection#size()}</replacement>
+  </entry>
+
+</filter>

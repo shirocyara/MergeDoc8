@@ -1,0 +1,4 @@
+<!ELEMENT filter (entry*)>
+<!ELEMENT entry (input,replacement)>
+<!ELEMENT input (#PCDATA)>
+<!ELEMENT replacement (#PCDATA)>

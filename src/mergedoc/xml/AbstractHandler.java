@@ -64,6 +64,26 @@ abstract public class AbstractHandler extends DefaultHandler {
 				rootEntry.addChild(currentEntry);
 			}
 			level++;
+		} else if (qName.equals("filter")) {
+			String target = attributes.getValue("対象");
+			if (level == 0) {
+
+				rootEntry = new ReplaceEntry();
+				rootEntry.setTarget(target);
+				currentEntry = rootEntry;
+
+			} else {
+
+				currentEntry = new ReplaceEntry();
+				if (target == null) {
+					currentEntry.setTarget(rootEntry.getTarget());
+				} else {
+					currentEntry.setTarget(target);
+				}
+				rootEntry.addChild(currentEntry);
+			}
+			level++;
+
 		}
 
 		currentQName = qName;
@@ -84,6 +104,11 @@ abstract public class AbstractHandler extends DefaultHandler {
 	 */
 	public void endElement(String uri, String localName, String qName) throws SAXException {
 		if ("置換エントリ".equals(qName)) {
+			level--;
+			if (level == 0) {
+				handle(rootEntry);
+			}
+		} else if (qName.equals("filter")) {
 			level--;
 			if (level == 0) {
 				handle(rootEntry);
@@ -120,6 +145,15 @@ abstract public class AbstractHandler extends DefaultHandler {
 		} else if ("後".equals(currentQName)) {
 			String after = expandEscape(c, start, length);
 			currentEntry.setAfter(after);
+
+		} else if (currentQName != null) {
+			if (currentQName.equals("input")) {
+				String before = String.valueOf(c, start, length);
+				currentEntry.setBefore(before);
+			} else if (currentQName.equals("replacement")) {
+				String after = expandEscape(c, start, length);
+				currentEntry.setAfter(after);
+			}
 		}
 	}
 

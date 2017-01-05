@@ -11,11 +11,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 /**
  * Javadoc API ドキュメントです。
@@ -29,17 +33,6 @@ public class APIDocument {
 
 	/** シグネチャをキーとしたコメントのテーブル */
 	private final Map<Signature, Comment> contextTable = new HashMap<Signature, Comment>();
-
-	/**
-	 * see タグや link タグの埋め込みリンクパターン。
-	 * 
-	 * <pre>
-	 *   group(1): URL
-	 *   group(2): ラベル
-	 * </pre>
-	 */
-	private static final Pattern linkClassPattern = PatternCache
-			.getPattern("(?si)<A\\s+HREF=\"([^\"]+)\"[^>]*><CODE>(.+?)</CODE></A>");
 
 	/**
 	 * コンストラクタです。
@@ -146,8 +139,9 @@ public class APIDocument {
 		}
 
 		// API ドキュメントのコメント解析
-		parseClassComment(className, docHtml);
-		parseMethodComment(className, docHtml);
+		Document document = Jsoup.parse(docHtml);
+		parseClassComment(className, document);
+		parseMethodComment(className, document);
 	}
 
 	/**
@@ -180,47 +174,41 @@ public class APIDocument {
 	 * @param docHtml
 	 *            API ドキュメントソース
 	 */
-	private void parseClassComment(String className, CharSequence docHtml) {
+	private void parseClassComment(String className, Document doc) {
+		Elements elements = doc.select("body div.contentContainer div.description ul li");
 
-		String baseRegex = "(?si)" + "<HR>\\s*" + "(|<B>.+?<P>\\s*)" + // 推奨されない
-				"<DL>\\s*" + "<DT>\\s*" + "<PRE>(.+?)</B>.*?" + // シグネチャ
-
-				"(</DL>\\s*</PRE>\\s*<P>|" + // 通常 Javadoc
-				"</PRE>\\s*</DT>\\s*</DL>\\s*<P>)" + // 特殊？ StringBuffer など
-				"\\s*" +
-
-				"(.+?)\\s*" + // 評価コンテキスト
-				"<P>\\s*" + "<!-- =";
-
-		Pattern pattern = PatternCache.getPattern(baseRegex);
-		Matcher matcher = pattern.matcher(docHtml);
-
-		if (matcher.find()) {
-
+		if (elements.isEmpty() == false) {
 			// シグネチャの作成
-			String sigStr = matcher.group(2);
+			String sigStr = elements.select("pre").first().html();
 			Signature sig = createSignature(className, sigStr);
 			Comment comment = new Comment(sig);
 
-			// deprecated タグ
-			String depre = matcher.group(1);
-			parseDeprecatedTag(className, depre, comment);
-
-			// 評価コンテキストの取得
-			String context = matcher.group(4);
-
-			// コメント本文
-			Pattern pat = PatternCache.getPattern("(?si)" + "(.+?)\\s*" + // 本文
-					"(<P>(|</P>)\\s*){2}");
-			Matcher mat = pat.matcher(context);
-			if (mat.find()) {
-				String body = mat.group(1);
+			if (!elements.select("div span.deprecatedLabel").isEmpty()) {
+				// deprecated タグ
+				parseDeprecatedTag(className, elements.select("div").first(), comment);
+			} else if (!elements.select("div").isEmpty()) {
+				// 本文
+				String body = "";
+				body = elements.select("div").last().html();
 				body = formatLinkTag(className, body);
 				comment.setDocumentBody(body);
 			}
 
-			// 共通タグ
-			parseCommonTag(className, context, comment);
+			Element el = elements.select("dl dt, dl dd").first();
+			while (el != null) {
+				if (el.html().contains("simpleTagLabel")) {
+					// since タグ
+					el = el.nextElementSibling();
+					comment.addSince(el.text());
+					el = el.nextElementSibling();
+				} else if (el.html().contains("seeLabel")) {
+					// see タグ
+					parseSeetag(className, el, comment);
+					el = el.nextElementSibling();
+				} else {
+					el = el.nextElementSibling();
+				}
+			}
 
 			// debug parseClassComment メソッドのシグネチャ、コメント確認
 			// log.debug(sig);
@@ -236,100 +224,103 @@ public class APIDocument {
 	 * @param docHtml
 	 *            API ドキュメントソース
 	 */
-	private void parseMethodComment(String className, CharSequence docHtml) {
-
-		// メソッド・フィールドのシグネチャとコメントを抜き出す正規表現
-		String baseRegex = "(?si)" + "<A NAME=.+?<!-- --></A>" + ".+?</H3>\n" + "<PRE>\\s*" + "(.*?)</PRE>\n" + // シグネチャ
-				"(.+?)(<HR>|<!-- =)"; // 評価コンテキスト
-
-		Pattern pattern = PatternCache.getPattern(baseRegex);
-		Matcher matcher = pattern.matcher(docHtml);
-
-		// メソッド・フィールドの数でループ
-		while (matcher.find()) {
-
+	private void parseMethodComment(String className, Document doc) {
+		Elements elements = doc.select("body div.contentContainer div.details ul li ul li ul li.blockList");
+		for (Element element : elements) {
 			// シグネチャの作成
-			String sigStr = matcher.group(1);
+			String sigStr = element.select("pre").first().html();
 			Signature sig = createSignature(className, sigStr);
 			Comment comment = new Comment(sig);
-
-			// 評価コンテキストの取得
-			String context = matcher.group(2);
-
-			// コメント本文
-			String bodyRegex = "(?si)" + "<DL>\\s*" + "<DD>(.*?)\\s*" + // 本文
-					"(|</DL>\\s*)" +
-
-					"<P>(|</P>)\\s*" +
-
-					"(</DL>\\s*|" + "<DL>\\s*<DT>|" + "<DL>\\s*</DL>|" + "<DD>\\s*<DL>|" + "</DD>\\s*</DL>|"
-					+ "</DD>\\s*<DD>)";
-
-			Pattern pat = PatternCache.getPattern(bodyRegex);
-			Matcher mat = pat.matcher(context);
-			if (mat.find()) {
-				String body = mat.group(1);
-				body = FastStringUtils.replaceFirst(body, "(?si)<B>推奨されていません。.*?(<P>\\s*<DD>|$|</B>(\\s*|&nbsp;)<DD>)",
-						"");
-				body = formatLinkTag(className, body);
-				comment.setDocumentBody(body);
-			}
-
-			// param タグ
-			if (context.contains("パラメータ:")) {
-				pat = PatternCache.getPattern("(?si)<DT><B>パラメータ:</B>(.+?(</DL>|<DT>|$))");
-				mat = pat.matcher(context);
-				if (mat.find()) {
-					String items = mat.group(1);
-					Pattern p = PatternCache.getPattern("(?si)<CODE>(.+?)</CODE> - (.*?)(<DD>|</DD>|</DL>|<DT>|$)");
-					Matcher m = p.matcher(items);
-					while (m.find()) {
-						String name = m.group(1);
-						String desc = formatLinkTag(className, m.group(2));
-						String param = name + " " + desc;
-						comment.addParam(param);
-					}
-				}
-			}
-
-			// return タグ
-			if (context.contains("戻り値:")) {
-				pat = PatternCache.getPattern("(?si)<DT><B>戻り値:</B><DD>(.+?)(</DL>|<DT>)");
-				mat = pat.matcher(context);
-				if (mat.find()) {
-					String str = mat.group(1);
-					str = formatLinkTag(className, str);
-					comment.addReturn(str);
-				}
-			}
-
-			// throws (exception) タグ
-			if (context.contains("例外:")) {
-				pat = PatternCache.getPattern("(?si)<DT><B>例外:</B>\\s*(<DD>.+?(</DL>|<DT>|$))");
-				mat = pat.matcher(context);
-				if (mat.find()) {
-					String items = mat.group(1);
-					Pattern p = PatternCache
-							.getPattern("(?si)<CODE>(.+?)</CODE>\\s*-\\s*(.*?)(<DD>|</DD>|</DL>|<DT>|$)");
-					Matcher m = p.matcher(items);
-					while (m.find()) {
-						String name = FastStringUtils.replaceAll(m.group(1), "(?si)(<A\\s.+?>|</A>)", "");
-						String desc = m.group(2);
-						desc = formatLinkTag(className, desc);
-						comment.addThrows(name + " " + desc);
-					}
-				}
-			}
-
-			// deprecated タグ
-			parseDeprecatedTag(className, context, comment);
-
-			// 共通タグ
-			parseCommonTag(className, context, comment);
 
 			// debug parseMethodComment メソッドのシグネチャ確認
 			// log.debug(sig);
 			contextTable.put(sig, comment);
+			if (!element.select("div span.deprecatedLabel").isEmpty()) {
+				// deprecated タグ
+				parseDeprecatedTag(className, element.select("div").first(), comment);
+			} else if (!element.select("div").isEmpty()) {
+				// 本文
+				String body = "";
+				body = element.select("div").last().html();
+				body = formatLinkTag(className, body);
+				comment.setDocumentBody(body);
+			}
+
+			Elements dts = element.select("dt, dd");
+			Element el = dts.first();
+			while (el != null) {
+				if (el.html().contains("paramLabel")) {
+					// param タグ
+					el = el.nextElementSibling();
+					if (el == null) {
+						break;
+					}
+					while (el.tagName().equals("dd")) {
+						String name = el.select("code").first().text();
+						String desc = el.html();
+						desc = desc.substring(desc.indexOf(" - ") + 3);
+						desc = desc.replaceAll("\n", "").replaceAll("\r", "");
+						desc = formatLinkTag(className, desc);
+						String param = name + " " + desc;
+						comment.addParam(param);
+						el = el.nextElementSibling();
+						if (el == null) {
+							break;
+						}
+					}
+				} else if (el.html().contains("returnLabel")) {
+					// return タグ
+					el = el.nextElementSibling();
+					if (el == null) {
+						break;
+					}
+					String str = el.html();
+					str = formatLinkTag(className, str);
+					comment.addReturn(str);
+					el = el.nextElementSibling();
+				} else if (el.html().contains("throwsLabel")) {
+					// throws (exception) タグ
+					el = el.nextElementSibling();
+					if (el == null) {
+						break;
+					}
+					while (el.tagName().equals("dd")) {
+						Elements a = el.select("code a[href]");
+						if (a.isEmpty()) {
+							el = el.nextElementSibling();
+							if (el == null) {
+								break;
+							}
+							continue;
+						}
+						String name = a.first().attr("href").toString();
+						name = formatClassName(className, name);
+						String desc = el.html();
+						desc = desc.substring(desc.indexOf(" - ") + 3);
+						desc = formatLinkTag(className, desc);
+						String param = name + " " + desc;
+						comment.addThrows(param);
+						el = el.nextElementSibling();
+						if (el == null) {
+							break;
+						}
+					}
+				} else if (el.html().contains("simpleTagLabel")) {
+					// since タグ
+					el = el.nextElementSibling();
+					if (el == null) {
+						break;
+					}
+					comment.addSince(el.text());
+					el = el.nextElementSibling();
+				} else if (el.html().contains("seeLabel")) {
+					// see タグ
+					parseSeetag(className, el, comment);
+					el = el.nextElementSibling();
+				} else {
+					el = el.nextElementSibling();
+				}
+			}
 		}
 	}
 
@@ -352,68 +343,57 @@ public class APIDocument {
 	}
 
 	/**
-	 * Javadoc の 共通タグを解析しコメントに追加します。
+	 * Javadoc の deprecated タグを解析しコメントに追加します。
 	 * 
 	 * @param className
 	 *            クラス名
-	 * @param context
-	 *            評価コンテキスト
+	 * @param element
+	 *            select("div") にて取得した Elements の最初の Element
 	 * @param comment
 	 *            コメント
 	 */
-	private void parseCommonTag(String className, String context, Comment comment) {
-
-		// see タグ
-		if (context.contains("関連項目:")) {
-			Pattern pat = PatternCache.getPattern("(?si)<DT><B>関連項目:.+?<DD>(.+?)</DL>");
-			Matcher mat = pat.matcher(context);
-
-			if (mat.find()) {
-				String items = mat.group(1);
-
-				// クラスへの参照
-				// linkClassPattern の group(2) はパッケージ情報が無いため
-				// group(1) の URL から取得する。
-				Matcher linkMatcher = linkClassPattern.matcher(items);
-				while (linkMatcher.find()) {
-					String url = linkMatcher.group(1);
-					String ref = formatClassName(className, url);
-					ref = FastStringUtils.replace(ref, "%28", "(");
-					ref = FastStringUtils.replace(ref, "%29", ")");
-					comment.addSee(ref);
-				}
-			}
+	private void parseDeprecatedTag(String className, Element element, Comment comment) {
+		if (element.select("span.deprecatedLabel").isEmpty()) {
+			return;
 		}
-
-		// since タグ
-		if (context.contains("導入されたバージョン:")) {
-			Pattern pat = PatternCache.getPattern("(?si)<DT><B>導入されたバージョン:.*?<DD>(.+?)\\s*(</DL>|</DD>)");
-			Matcher mat = pat.matcher(context);
-
-			if (mat.find()) {
-				comment.addSince(mat.group(1));
-			}
+		Element div = element.select("span.deprecationComment").first();
+		String deprecated = "";
+		if (div != null) {
+			deprecated = div.html();
+			deprecated = formatLinkTag(className, deprecated);
 		}
+		comment.addDeprecated(deprecated);
 	}
 
 	/**
-	 * Javadoc の deprecated タグを解析しコメントに追加します。
+	 * Javadoc の see タグを解析しコメントに追加します。
 	 * 
-	 * @param context
-	 *            評価コンテキスト
+	 * @param className
+	 *            クラス名
+	 * @param element
+	 *            .select("dt, dd") にて取得した Elements の中の
+	 *            .html().contains("seeLabel") に合致する Element 。
 	 * @param comment
 	 *            コメント
 	 */
-	private void parseDeprecatedTag(String className, String context, Comment comment) {
-
-		if (context.contains("推奨されていません。")) {
-			Pattern pat = PatternCache.getPattern("(?si)<B>推奨されていません。.+?<I>(.+?)</I>");
-			Matcher mat = pat.matcher(context);
-			if (mat.find()) {
-				String str = mat.group(1);
-				str = formatLinkTag(className, str);
-				comment.addDeprecated(str);
+	private void parseSeetag(String className, Element element, Comment comment) {
+		// see タグ
+		if (!element.html().contains("seeLabel")) {
+			return;
+		}
+		Element el = element.nextElementSibling();
+		if (el == null) {
+			return;
+		}
+		for (Element a : el.select("a[href] code")) {
+			String url = a.parentNode().attr("href");
+			String ref;
+			if (a.childNodeSize() != 1) {
+				ref = a.outerHtml();
+			} else {
+				ref = formatClassName(className, url);
 			}
+			comment.addSee(ref);
 		}
 	}
 
@@ -430,35 +410,83 @@ public class APIDocument {
 	 * @return Javadoc link タグ文字列
 	 */
 	private String formatLinkTag(String className, String html) {
-
-		StringBuffer sb = new StringBuffer();
-		Matcher linkMatcher = linkClassPattern.matcher(html);
-
-		while (linkMatcher.find()) {
-
-			String url = linkMatcher.group(1).trim();
-			String label = linkMatcher.group(2).trim();
+		// HTML構文を解析
+		Document document = Jsoup.parse(html);
+		document.outputSettings().indentAmount(0);
+		Elements elements = document.select("a[href]");
+		for (Element element : elements) {
+			String url = element.attr("href");
+			StringBuilder link = new StringBuilder();
 			String ref = formatClassName(className, url);
 
-			StringBuilder link = new StringBuilder();
-			link.append("{@link ");
-			link.append(ref);
-			if (label.length() > 0) {
+			Elements codes = element.select("code");
+			String label = codes.size() > 0 ? codes.first().text() : element.text();
+			if (element.text().equals(label)) {
 
-				ref = ref.replace('#', '.');
-				if (!ref.endsWith(label)) {
-					link.append(" ");
-					link.append(label);
+				link.append("{@link ");
+				link.append(ref);
+				if (label.length() > 0) {
+					ref = ref.replace('#', '.');
+					label = label.replaceAll(" ", "");
+					label = label.replaceAll("java.lang.", "");
+					if (!ref.endsWith(label)) {
+						link.append(" ");
+						link.append(label);
+					}
 				}
+				link.append("}");
+
+			} else {
+				link.append("{@linkplain ");
+				link.append(ref);
+				link.append(" ");
+				link.append(element.html());
+				link.append("}");
 			}
-			link.append("}");
 
-			linkMatcher.appendReplacement(sb, link.toString());
+			// <_delete_> タグを目印にしてリンクタグを置換する。
+			Element cld = document.createElement("_delete_");
+			cld.append(link.toString());
+			element.replaceWith(cld);
 		}
-		linkMatcher.appendTail(sb);
-		html = sb.toString();
 
-		return html;
+		// 不必要なタグを削除する。
+		String ret = document.select("body").toString();
+		ret = ret.replaceAll("<body>", "").replaceAll("</body>", "");
+		ret = ret.replaceAll("<_delete_>", "").replaceAll("</_delete_>", "");
+		ret = ret.replaceAll("\n", "").replaceAll("\r", "");
+		ret = ret.replaceAll("、", ",");
+
+		return ret;
+	}
+
+	/**
+	 * HTML の CODE タグを Javadoc の code タグにフォーマットします。
+	 * 
+	 * @param html
+	 *            HTML の CODE タグを含む文字列
+	 * @return Javadoc code タグ文字列
+	 */
+	private String formatCodeTag(String html) {
+		// HTML構文を解析
+		Document document = Jsoup.parse(html);
+		document.outputSettings().indentAmount(0);
+		Elements elements = document.select("code");
+		for (Element element : elements) {
+			String label = element.text();
+			
+			// <_delete_> タグを目印にしてコードタグを置換する。
+			Element cld = document.createElement("_delete_");
+			cld.append("{@code " + label + "}");
+			element.replaceWith(cld);
+		}
+
+		// 不必要なタグを削除する。
+		String ret = document.select("body").toString();
+		ret = ret.replaceAll("<body>", "").replaceAll("</body>", "");
+		ret = ret.replaceAll("<_delete_>", "").replaceAll("</_delete_>", "");
+		ret = ret.replaceAll("\n", "").replaceAll("\r", "");
+		return ret;
 	}
 
 	/**
@@ -479,10 +507,30 @@ public class APIDocument {
 
 		path = FastStringUtils.replace(path, ".html", "");
 		path = path.replace('/', '.');
+		path = FastStringUtils.replaceAll(path, "-(.*)-$", "($1)");
+		path = FastStringUtils.replaceAll(path, "-", ",");
+		path = FastStringUtils.replaceAll(path, ":A", "[]");
 		path = FastStringUtils.replaceFirst(path, "^\\.*", "");
 		path = FastStringUtils.replaceAll(path, "java.lang" + lastClassPrefix, "$1");
 		path = path.replaceAll(packageName + lastClassPrefix, "$1"); // Patternキャッシュしない
 		path = path.replaceAll(lastClassName + "#", "#"); // Patternキャッシュしない
+		return path;
+	}
+
+	/**
+	 * see タグや link タグの URL を package.class#member 形式にフォーマットします。
+	 * 
+	 * @param path
+	 *            パス
+	 * @return package.class#member 形式の文字列
+	 */
+	private String formatClassName(String path) {
+		path = FastStringUtils.replaceAll(path, ".html", "");
+		path = FastStringUtils.replaceAll(path, "\\.\\./", "");
+		path = path.replace('/', '.');
+		path = FastStringUtils.replaceAll(path, "-(.*)-$", "($1)");
+		path = FastStringUtils.replaceAll(path, "-", ",");
+		path = FastStringUtils.replaceAll(path, ":A", "[]");
 		return path;
 	}
 }

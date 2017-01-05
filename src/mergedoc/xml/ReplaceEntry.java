@@ -189,7 +189,10 @@ public class ReplaceEntry {
 		} else {
 
 			// 対象が指定されていない場合
-			source = FastStringUtils.replaceAll(source, before, after);
+			before = escapeSequence(before);
+			after = escapeSequence(after);
+			source = source.replaceAll(before, after);
+			// source = FastStringUtils.replaceAll(source, before, after);
 		}
 		return source;
 	}
@@ -214,5 +217,17 @@ public class ReplaceEntry {
 			}
 		}
 		return sb.toString();
+	}
+
+	private String escapeSequence(String value) {
+		String ret = value;
+		ret = ret.replaceAll("\\@", "\\\\@");
+		ret = ret.replaceAll("\\{", "\\\\{");
+		ret = ret.replaceAll("\\}", "\\\\}");
+		ret = ret.replaceAll("\\#", "\\\\#");
+		ret = ret.replaceAll("\\.", "\\\\.");
+		ret = ret.replaceAll("\\(", "\\\\(");
+		ret = ret.replaceAll("\\)", "\\\\)");
+		return ret;
 	}
 }
