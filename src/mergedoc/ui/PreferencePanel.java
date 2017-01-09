@@ -102,7 +102,7 @@ public class PreferencePanel extends JPanel {
 		JComboBox<Object> outCombo = outField.getComboBox();
 		docCombo.addItem(FileChooserField.ENCODING_AUTO);
 		srcCombo.addItem(FileChooserField.ENCODING_AUTO);
-		docCombo.setSelectedItem("EUC-JP");
+		docCombo.setSelectedItem(FileChooserField.ENCODING_DEFAULT);
 		srcCombo.setSelectedItem(FileChooserField.ENCODING_DEFAULT);
 		outCombo.setSelectedItem(FileChooserField.ENCODING_DEFAULT);
 		@SuppressWarnings("rawtypes")
