@@ -451,8 +451,7 @@ public class APIDocument {
 		}
 
 		// 不必要なタグを削除する。
-		String ret = document.select("body").toString();
-		ret = ret.replace("<body>", "").replace("</body>", "");
+		String ret = document.select("body").html();
 		ret = ret.replace("<_delete_>", "").replace("</_delete_>", "");
 		ret = ret.replace("\n", "");
 		ret = ret.replace("、", ",");
@@ -482,8 +481,7 @@ public class APIDocument {
 		}
 
 		// 不必要なタグを削除する。
-		String ret = document.select("body").toString();
-		ret = ret.replace("<body>", "").replace("</body>", "");
+		String ret = document.select("body").html();
 		ret = ret.replace("<_delete_>", "").replace("</_delete_>", "");
 		ret = ret.replace("\n", "");
 		return ret;

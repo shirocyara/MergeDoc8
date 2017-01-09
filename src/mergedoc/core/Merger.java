@@ -226,20 +226,30 @@ public class Merger {
 					}
 				}
 			} else if (c[cnt] == '/' && c[cnt + 1] == '/') {
+				cnt++;
 				// 行コメントを読み飛ばし
 				for (cnt++; cnt <= last; cnt++) {
 					if (c[cnt] == '\n') {
-						cnt++;
 						break;
 					}
 				}
 			}
 			if (cnt > last)
 				break;
-			sb.append(c[cnt]);
+			if (sb.length() == 0 && c[cnt] == '\n') {
+			} else if (cnt > 0) {
+				if (c[cnt] != '\n' || c[cnt - 1] != '\n') {
+					sb.append(c[cnt]);
+				}
+			} else {
+				sb.append(c[cnt]);
+			}
 		}
-		if (cnt == last)
-			sb.append(c[cnt]);
+		if (cnt == last) {
+			if (c[cnt] != '\n') {
+				sb.append(c[cnt]);
+			}
+		}
 
 		return sb.toString();
 	}
