@@ -113,7 +113,7 @@ public class Merger {
 			String tmp[] = searchClass(src).split(" ");
 			int cnt = -1;
 			for (int i = 0; i < tmp.length; i++) {
-				if(CLASS_KIND.contains(tmp[i])){
+				if (CLASS_KIND.contains(tmp[i])) {
 					cnt = i;
 					break;
 				}
@@ -210,39 +210,38 @@ public class Merger {
 	 * @return 修正した対象文字列
 	 */
 	private String delComment(String src) {
-		String ret = src;
+		StringBuilder sb = new StringBuilder();
 
-		int pos = 0;
-		do {
-			int cnt = ret.indexOf("/", pos);
-			if (cnt == -1) {
+		char[] c = src.toCharArray();
+		int last = c.length - 1;
+		int cnt;
+		for (cnt = 0; cnt < last; cnt++) {
+			if (c[cnt] == '/' && c[cnt + 1] == '*') {
+				cnt++;
+				// ブロックコメントを読み飛ばし
+				for (cnt++; cnt <= last; cnt++) {
+					if (c[cnt - 1] == '*' && c[cnt] == '/') {
+						cnt++;
+						break;
+					}
+				}
+			} else if (c[cnt] == '/' && c[cnt + 1] == '/') {
+				// 行コメントを読み飛ばし
+				for (cnt++; cnt <= last; cnt++) {
+					if (c[cnt] == '\n') {
+						cnt++;
+						break;
+					}
+				}
+			}
+			if (cnt > last)
 				break;
-			}
-			if (ret.substring(cnt, cnt + 2).equals("//")) {
-				int tmp = ret.indexOf("\n", cnt);
-				if (tmp == -1 || tmp == ret.length() - 1) {
-					return ret.substring(0, cnt - 1);
-				}
-				if (tmp == ret.length() - 1) {
-					return ret.substring(0, cnt - 1);
-				}
-				if (cnt == 0) {
-					ret = ret.substring(tmp + 1);
-				} else {
-					ret = ret.substring(0, cnt - 1) + ret.substring(tmp);
-				}
-			} else if (ret.substring(cnt, cnt + 2).equals("/*")) {
-				int tmp = ret.indexOf("*/", cnt);
-				if (cnt == 0) {
-					ret = ret.substring(tmp + 2);
-				} else {
-					ret = ret.substring(0, cnt) + " " + ret.substring(tmp + 2);
-				}
-			} else {
-				pos = cnt + 1;
-			}
-		} while (true);
-		return ret;
+			sb.append(c[cnt]);
+		}
+		if (cnt == last)
+			sb.append(c[cnt]);
+
+		return sb.toString();
 	}
 
 }
