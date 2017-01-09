@@ -227,6 +227,7 @@ public class MergeManager {
 				source = FastStringUtils.optimizeLineSeparator(source);
 				source = FastStringUtils.untabify(source);
 
+				// Check the Java source and replace it before merging, if any.
 				source = chkFilter(entryName, source);
 
 				// Java ソースを API ドキュメントとマージ

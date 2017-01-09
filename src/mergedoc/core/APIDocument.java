@@ -259,7 +259,7 @@ public class APIDocument {
 						String name = el.select("code").first().text();
 						String desc = el.html();
 						desc = desc.substring(desc.indexOf(" - ") + 3);
-						desc = desc.replaceAll("\n", "").replaceAll("\r", "");
+						desc = desc.replace("\n", "");
 						desc = formatLinkTag(className, desc);
 						String param = name + " " + desc;
 						comment.addParam(param);
@@ -427,8 +427,8 @@ public class APIDocument {
 				link.append(ref);
 				if (label.length() > 0) {
 					ref = ref.replace('#', '.');
-					label = label.replaceAll(" ", "");
-					label = label.replaceAll("java.lang.", "");
+					label = label.replace(" ", "");
+					label = label.replace("java.lang.", "");
 					if (!ref.endsWith(label)) {
 						link.append(" ");
 						link.append(label);
@@ -452,10 +452,10 @@ public class APIDocument {
 
 		// 不必要なタグを削除する。
 		String ret = document.select("body").toString();
-		ret = ret.replaceAll("<body>", "").replaceAll("</body>", "");
-		ret = ret.replaceAll("<_delete_>", "").replaceAll("</_delete_>", "");
-		ret = ret.replaceAll("\n", "").replaceAll("\r", "");
-		ret = ret.replaceAll("、", ",");
+		ret = ret.replace("<body>", "").replace("</body>", "");
+		ret = ret.replace("<_delete_>", "").replace("</_delete_>", "");
+		ret = ret.replace("\n", "");
+		ret = ret.replace("、", ",");
 
 		return ret;
 	}
@@ -483,9 +483,9 @@ public class APIDocument {
 
 		// 不必要なタグを削除する。
 		String ret = document.select("body").toString();
-		ret = ret.replaceAll("<body>", "").replaceAll("</body>", "");
-		ret = ret.replaceAll("<_delete_>", "").replaceAll("</_delete_>", "");
-		ret = ret.replaceAll("\n", "").replaceAll("\r", "");
+		ret = ret.replace("<body>", "").replace("</body>", "");
+		ret = ret.replace("<_delete_>", "").replace("</_delete_>", "");
+		ret = ret.replace("\n", "");
 		return ret;
 	}
 

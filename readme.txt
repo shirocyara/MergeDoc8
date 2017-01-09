@@ -21,6 +21,7 @@ Eclipse は日本語化しても Java 標準 API のメソッドなどにマウ�
 # 
 #   MergeDoc 1.x.x = JDK1.4 以前の javadoc で作成された API ドキュメントに対応
 #   MergeDoc 2.x.x = JDK5.0 以降の javadoc で作成された API ドキュメントに対応
+#   MergeDoc 8.x.x = JDK8.0 以降の javadoc で作成された API ドキュメントに対応
 # 
 # API ドキュメントが作成された javadoc コマンドのバージョンに依存しています。
 # Java ソースのバージョンは無関係です。
@@ -34,8 +35,8 @@ Eclipse は日本語化しても Java 標準 API のメソッドなどにマウ�
 
 インストール
 
-  mergedoc.zip を適当な場所に解凍してください。
-  
+  mergedoc8.zip を適当な場所に解凍してください。
+
   以前のバージョンがある場合は置換定義ファイルを上書きしてしまうのでカスタマイズ
   している場合は事前に退避してください。
 
@@ -54,15 +55,15 @@ Eclipse は日本語化しても Java 標準 API のメソッドなどにマウ�
   Windows で JAR ファイルに JRE/JDK5.0 以上の javaw を関連付けている場合は
   mergedoc.jar ダブルクリックで起動します。また mergedoc.jar のショートカットで
   も起動出来ます（ショートカット用のアイコンは \conf\icon.ico）。
-  
+
     [Windows での jar ファイル関連付け設定例]
-    
+
       "c:\jdk1.5.0\jre\bin\javaw.exe" -jar "%1" %*
-  
+
   それ以外の場合は次のようなコマンドで起動してください。
 
       java -jar mergedoc.jar
-    
+
   MergeDoc の場合、-server オプションも合わせて指定することで、高速化されるよう
   です。
 
@@ -100,9 +101,9 @@ Eclipse は日本語化しても Java 標準 API のメソッドなどにマウ�
          package-list ファイルがあるディレクトリです。
 
            例）C:\jdk1.5.0\docs\ja\api
-         
+
          JDK の場合は下記エンコーディングを指定してください。
-         
+
            J2SE 5.0 日本語 API ドキュメントの場合: EUC-JP
            Java 6   日本語 API ドキュメントの場合: UTF-8
 
@@ -111,12 +112,12 @@ Eclipse は日本語化しても Java 標準 API のメソッドなどにマウ�
 
          Java ソースアーカイブファイルを指定。
          ファイル形式は「.zip」「.jar」「.tar.gz」「.tgz」のいずれか。
-         
+
            例）C:\jdk1.5.0\src.zip
-         
+
          エンコーディングは JDK の場合、ASCII 以外の文字が含まれていないので
          何でもかまいません。
-         
+
 
      * 出力ソースアーカイブファイル
 
@@ -148,11 +149,11 @@ Eclipse は日本語化しても Java 標準 API のメソッドなどにマウ�
 
 
 Eclipse で使用する場合の設定
-  
+
   メニューから [ウィンドウ] - [設定] - [インストール済みのJRE] の
   編集画面で rt.jar のツリーを開き、Java ソースの添付でロケーションパスに
   MergeDoc で作成した出力ソースアーカイブファイルを指定してください。
-  
+
   プロジェクト毎に設定したい場合はパッケージエクスプローラから JRE システム・
   ライブラリー内の rt.jar を右クリックしてプロパティを開き Java ソースの添付を
   行ってください。
@@ -164,27 +165,27 @@ Eclipse で使用する場合の設定
   J2SE5.0 日本語 API ドキュメント（2004年12月公開）は、既に元の Java ソースと
   内容がかみ合わない部分があります。これらはマージ結果に以下のような影響が
   あります。
-  
+
     1. クラス階層の不一致
-     
+
       例えば Java ソース上は StringBuilder や StringBuffer の親クラスは
       AbstractStringBuilder ですが、API ドキュメントでは親クラスは Object に
       なっており AbstractStringBuilder が存在しません。また、メソッドなどの
       ページ内リンクが動作せず、HTML フォーマットもなぜか他のクラスとかなり
       異なるようです。
-      
+
       Java ソース上のコメントは AbstractStringBuilder に記述され、サブクラスと
       なる StringBuffer などの Javadoc コメントは省略（継承）されています。
-      
+
       このようなクラスはコメントのマッチングが不可能なためマージはほとんど
       行われません。
-   
+
     2. <pre> タグ内の改行情報の欠落
-      
+
       例えば String や Thread などのクラスコメントに記述されている <pre> タグ内
       コードの改行情報が欠落し 1 行になっています。これはブラウザで確認すること
       ができます。
-      
+
       今のところ MergeDoc では元の Java ソース <pre> タグ内容を使用することで
       この問題を回避しています。
 
@@ -192,6 +193,9 @@ Eclipse で使用する場合の設定
 
 履歴
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+8.0.1 (2017.01.09)
+- 正規表現での変換を減らした。
+
 8.0.0 (2017.01.05)
 - JDK8 に対応しました。
 
@@ -258,6 +262,6 @@ Eclipse で使用する場合の設定
   Foundation product are made available under the terms of the Common Public
   License v1.0 which accompanies this distribution, and is available
   at cpl-v10.html.
-  
+
   Please read the different LICENSE files present in the root directory of
   this distribution.
