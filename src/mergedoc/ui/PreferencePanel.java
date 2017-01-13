@@ -13,6 +13,7 @@ import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -48,6 +49,9 @@ public class PreferencePanel extends JPanel {
 
 	/** 基本設定パネル：出力ソースアーカイブファイル ファイル選択フィールド */
 	private FileChooserField outField = new FileChooserField();
+
+	/** 基本設定パネル：API ドキュメントのダウンロード可否 */
+	private JCheckBox apiDownload = new JCheckBox();
 
 	/** 詳細設定パネル：スプリットペイン */
 	private JSplitPane splitPane = new JSplitPane();
@@ -119,11 +123,15 @@ public class PreferencePanel extends JPanel {
 			}
 		});
 
+		// チェックボックスを作成
+		apiDownload = new JCheckBox("API ドキュメントの上書きダウンロードを行う");
+
 		// 上部パネル作成
 		JPanel panel = new TitledPanel("基本設定");
 		panel.add(docField);
 		panel.add(srcField);
 		panel.add(outField);
+		panel.add(apiDownload);
 
 		// 起動オプションのターゲットディレクトリ取得
 		final String OPTION_KEY = "target.directory";
@@ -147,6 +155,12 @@ public class PreferencePanel extends JPanel {
 		loadPersister(docField, Persister.DOC_DIR, Persister.DOC_ENC);
 		loadPersister(srcField, Persister.IN_FILE, Persister.IN_ENC);
 		loadPersister(outField, Persister.OUT_FILE, Persister.OUT_ENC);
+		String param = Persister.getInstance().getString(Persister.API_DONWLOAD, "");
+		if (param.equals("") || !param.equals("true")) {
+			apiDownload.setSelected(false);
+		} else {
+			apiDownload.setSelected(true);
+		}
 
 		// 未設定時のデフォルト設定
 		String docPath = docField.getFile().getPath();
@@ -352,6 +366,7 @@ public class PreferencePanel extends JPanel {
 			String docEnc = docField.getComboBox().getSelectedItem().toString();
 			String srcEnc = srcField.getComboBox().getSelectedItem().toString();
 			String outEnc = outField.getComboBox().getSelectedItem().toString();
+			boolean apiDown = apiDownload.isSelected();
 			ReplaceEntry[] entries = getSelectedEntries();
 
 			public File getDocDirectory() {
@@ -378,6 +393,14 @@ public class PreferencePanel extends JPanel {
 				return outEnc;
 			}
 
+			public String getApiDownload() {
+				if (apiDown) {
+					return "true";
+				} else {
+					return "false";
+				}
+			}
+
 			public ReplaceEntry[] getGlobalEntries() {
 				return entries;
 			}
@@ -401,6 +424,7 @@ public class PreferencePanel extends JPanel {
 		psst.setString(Persister.DOC_ENC, pref.getDocEncoding());
 		psst.setString(Persister.IN_ENC, pref.getInputEncoding());
 		psst.setString(Persister.OUT_ENC, pref.getOutputEncoding());
+		psst.setString(Persister.API_DONWLOAD, pref.getApiDownload());
 		psst.setInt(Persister.DETAIL_PANEL_HEIGHT, splitPane.getDividerLocation());
 
 		List<String> descList = new LinkedList<String>();

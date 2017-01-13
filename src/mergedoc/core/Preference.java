@@ -59,6 +59,12 @@ public interface Preference {
 	String getOutputEncoding();
 
 	/**
+	 * API ドキュメントのダウンロード可否を取得します。
+	 * @return API ドキュメントダウンロードの有無 (true, false)
+	 */
+	String getApiDownload();
+	
+	/**
 	 * グローバル置換エントリの配列を取得します。
 	 * 
 	 * @return グローバル置換エントリの配列

@@ -5,10 +5,16 @@
  */
 package mergedoc.core;
 
+import java.io.BufferedOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -20,6 +26,9 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+
+import mergedoc.MergeDocException;
+import mergedoc.xml.Persister;
 
 /**
  * Javadoc API ドキュメントです。
@@ -47,6 +56,71 @@ public class APIDocument {
 	 *             入出力例外が発生した場合
 	 */
 	public APIDocument(File docDir, String className, String charsetName) throws IOException {
+
+		boolean apiD = false;
+		try {
+			if (Persister.getInstance().getString(Persister.API_DONWLOAD, "").equals("true")) {
+				apiD = true;
+				if (className.startsWith("com.sun.")) {
+					return;
+				}
+				URL url;
+				if (!Persister.getInstance().getString(Persister.API_URL, "").equals("")) {
+					url = new URL(Persister.getInstance().getString(Persister.API_URL, "") + className.replace('.', '/')
+							+ ".html");
+				} else {
+					url = new URL(
+							"http://docs.oracle.com/javase/jp/8/docs/api/" + className.replace('.', '/') + ".html");
+				}
+
+				HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+				conn.setAllowUserInteraction(false);
+				conn.setInstanceFollowRedirects(true);
+				conn.setRequestMethod("GET");
+				conn.connect();
+
+				if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+					throw new Exception();
+				}
+
+				// Input Stream
+				DataInputStream dataInStream = new DataInputStream(conn.getInputStream());
+
+				// Output Stream
+				// API ドキュメント絶対パスを生成
+				StringBuilder path = new StringBuilder();
+				path.append(docDir.getPath());
+				path.append(File.separator);
+				path.append(className.replace('.', File.separatorChar));
+				path.append(".html");
+				File apiDir = new File(new File(path.toString()).getParent());
+				apiDir.mkdirs();
+				DataOutputStream dataOutStream = new DataOutputStream(
+						new BufferedOutputStream(new FileOutputStream(path.toString())));
+
+				// Read Data
+				byte[] b = new byte[4096];
+				int readByte = 0;
+
+				while (-1 != (readByte = dataInStream.read(b))) {
+					dataOutStream.write(b, 0, readByte);
+				}
+
+				// Close Stream
+				dataInStream.close();
+				dataOutStream.close();
+			}
+		} catch (MergeDocException e) {
+			// 設定ファイルが取得できない場合
+			apiD = false;
+		} catch (Exception e) {
+			// ダウンロードエラーが発生した場合
+			apiD = false;
+		}
+
+		if (!apiD) {
+			return;
+		}
 
 		// API ドキュメント絶対パスを生成
 		StringBuilder path = new StringBuilder();
@@ -473,7 +547,7 @@ public class APIDocument {
 		Elements elements = document.select("code");
 		for (Element element : elements) {
 			String label = element.text();
-			
+
 			// <_delete_> タグを目印にしてコードタグを置換する。
 			Element cld = document.createElement("_delete_");
 			cld.append("{@code " + label + "}");

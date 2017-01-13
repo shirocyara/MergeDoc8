@@ -7,10 +7,14 @@ package mergedoc.core;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -25,6 +29,7 @@ import javax.xml.parsers.SAXParser;
 
 import mergedoc.MergeDocException;
 import mergedoc.xml.ConfigManager;
+import mergedoc.xml.Persister;
 import mergedoc.xml.ReplaceEntry;
 import mergedoc.xml.ReplaceHandler;
 
@@ -107,11 +112,13 @@ public class MergeManager {
 	 */
 	public void validate() throws MergeDocException, IOException, InterruptedException, ExecutionException {
 
+		boolean apiD = pref.getApiDownload().equals("true");
+
 		// API ドキュメントディレクトリのチェック
 		File docDir = pref.getDocDirectory();
-		if (docDir != null && docDir.getPath().length() > 0) {
+		if (docDir != null && docDir.getPath().length() > 0 && !apiD) {
 			File rootFile = new File(docDir, "allclasses-frame.html");
-			if (!rootFile.exists()) {
+			if (!rootFile.exists() && !apiD) {
 				throw new MergeDocException("正しい API ドキュメントディレクトリを指定してください。\n"
 						+ "指定するディレクトリには allclasses-frame.html ファイルが\n" + "含まれている必要があります。");
 			}

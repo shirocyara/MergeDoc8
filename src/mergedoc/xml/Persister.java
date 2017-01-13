@@ -59,6 +59,12 @@ public class Persister {
 	/** 出力エンコーディングのキー */
 	public static final Key OUT_ENC = new Key("output.source.charset");
 
+	/** API ドキュメントのダウンロード可否 */
+	public static final Key API_DONWLOAD = new Key("api.document.download");
+
+	/** API ドキュメントのダウンロード先URL */
+	public static final Key API_URL = new Key("api.document.url");
+
 	/** チェック済み置換エントリの説明（配列）のキー */
 	public static final Key REPLACE_DESCRIPTION_ARRAY = new Key("replace.entry.descprition");
 
