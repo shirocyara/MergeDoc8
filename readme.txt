@@ -1,8 +1,8 @@
-﻿MergeDoc 8
+﻿MergeJDoc
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-実行環境: JRE8.0 以上
-URL： https://github.com/shirocyara/MergeDoc8
+実行環境: JRE9.0 以上
+URL： https://github.com/shirocyara/MergeJDoc
 
 Eclipse は日本語化しても Java 標準 API のメソッドなどにマウスを合わせたときにホ
 バー表示される説明は日本語化されません。これは Eclipse が JDK 付属の Java ソース
@@ -17,11 +17,10 @@ Eclipse は日本語化しても Java 標準 API のメソッドなどにマウ�
 
 ################################################################################
 # 
-# MergeDoc のバージョンついて
+# MergeJDoc のバージョンついて
 # 
-#   MergeDoc 1.x.x = JDK1.4 以前の javadoc で作成された API ドキュメントに対応
-#   MergeDoc 2.x.x = JDK5.0 以降の javadoc で作成された API ドキュメントに対応
-#   MergeDoc 8.x.x = JDK8.0 以降の javadoc で作成された API ドキュメントに対応
+#   MergeJDoc 2.x.x = JDK5.0 以降の javadoc で作成された API ドキュメントに対応
+#   MergeJDoc 8.x.x = JDK8.0 以降の javadoc で作成された API ドキュメントに対応
 # 
 # API ドキュメントが作成された javadoc コマンドのバージョンに依存しています。
 # Java ソースのバージョンは無関係です。
@@ -35,7 +34,7 @@ Eclipse は日本語化しても Java 標準 API のメソッドなどにマウ�
 
 インストール
 
-  mergedoc8.zip を適当な場所に解凍してください。
+  mergejdoc9.zip を適当な場所に解凍してください。
 
   以前のバージョンがある場合は置換定義ファイルを上書きしてしまうのでカスタマイズ
   している場合は事前に退避してください。
@@ -52,19 +51,19 @@ Eclipse は日本語化しても Java 標準 API のメソッドなどにマウ�
 
 起動方法
 
-  Windows で JAR ファイルに JRE/JDK5.0 以上の javaw を関連付けている場合は
-  mergedoc.jar ダブルクリックで起動します。また mergedoc.jar のショートカットで
+  Windows で JAR ファイルに JRE/JDK9.0 以上の javaw を関連付けている場合は
+  mergejdoc.jar ダブルクリックで起動します。また mergejdoc.jar のショートカットで
   も起動出来ます（ショートカット用のアイコンは \conf\icon.ico）。
 
     [Windows での jar ファイル関連付け設定例]
 
-      "c:\jdk1.5.0\jre\bin\javaw.exe" -jar "%1" %*
+      "C:\Program Files\Java\jre-9.0.4\bin\javaw.exe" -jar "%1" %*
 
   それ以外の場合は次のようなコマンドで起動してください。
 
-      java -jar mergedoc.jar
+      java -jar mergejdoc.jar
 
-  MergeDoc の場合、-server オプションも合わせて指定することで、高速化されるよう
+  MergeJDoc の場合、-server オプションも合わせて指定することで、高速化されるよう
   です。
 
 
@@ -76,14 +75,14 @@ Eclipse は日本語化しても Java 標準 API のメソッドなどにマウ�
       リを指定することで設定画面にデフォルトのファイル名が初期値としてセットされ
       ます。
 
-        例）java -jar -Dtarget.directory=C:\jdk1.5.0 mergedoc.jar
+        例）java -jar -Dtarget.directory=C:\Java mergedoc.jar
 
       API ドキュメントは JDK インストールディレクトリ内に配置しておくことをお勧
       めします。このオプションにより API ドキュメントディレクトリも検出されます。
       また、このオプションを指定しなかった場合でも、API ドキュメントディレクトリ
       設定時に入出力アーカイブファイルが自動で検出されます。
 
-        例）C:\jdk1.5.0\docs\ja\api\
+        例）C:\Java\docs\ja\api\
 
 
 
@@ -100,12 +99,12 @@ Eclipse は日本語化しても Java 標準 API のメソッドなどにマウ�
          日本語 API ドキュメントを格納しているディレクトリを指定。
          package-list ファイルがあるディレクトリです。
 
-           例）C:\jdk1.5.0\docs\ja\api
+           例）C:\Java\docs\ja\api
 
          JDK の場合は下記エンコーディングを指定してください。
 
-           J2SE 5.0 日本語 API ドキュメントの場合: EUC-JP
-           Java 6   日本語 API ドキュメントの場合: UTF-8
+           J2SE 5.0  日本語 API ドキュメントの場合: EUC-JP
+           Java 6 >= 日本語 API ドキュメントの場合: UTF-8
 
 
      * 入力ソースアーカイブファイル
@@ -113,7 +112,7 @@ Eclipse は日本語化しても Java 標準 API のメソッドなどにマウ�
          Java ソースアーカイブファイルを指定。
          ファイル形式は「.zip」「.jar」「.tar.gz」「.tgz」のいずれか。
 
-           例）C:\jdk1.5.0\src.zip
+           例）C:\Java\src.zip
 
          エンコーディングは JDK の場合、ASCII 以外の文字が含まれていないので
          何でもかまいません。
@@ -124,7 +123,7 @@ Eclipse は日本語化しても Java 標準 API のメソッドなどにマウ�
          ソースを出力する新しいアーカイブファイルを指定。
          ファイル形式は「.zip」「.jar」のいずれか。
 
-           例）C:\jdk1.5.0\srcja_MS932.zip
+           例）C:\Java\srcja_MS932.zip
 
          エンコーディングは使用するエディタや IDE の設定に合わせてください。
          Eclipse の場合はテキスト・ファイル・エンコードと同じにします。プロジェ
@@ -152,7 +151,7 @@ Eclipse で使用する場合の設定
 
   メニューから [ウィンドウ] - [設定] - [インストール済みのJRE] の
   編集画面で rt.jar のツリーを開き、Java ソースの添付でロケーションパスに
-  MergeDoc で作成した出力ソースアーカイブファイルを指定してください。
+  MergeJDoc で作成した出力ソースアーカイブファイルを指定してください。
 
   プロジェクト毎に設定したい場合はパッケージエクスプローラから JRE システム・
   ライブラリー内の rt.jar を右クリックしてプロパティを開き Java ソースの添付を
@@ -257,14 +256,6 @@ Eclipse で使用する場合の設定
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
   Copyright (c) 2003- Shinji Kashihara. All rights reserved.
+  Copyright (c) 2017- kuro. All rights reserved.
 
-  This product includes software developed by
-  The Apache Software Foundation (http://www.apache.org/).
-
-  This program and the accompanying materials except for Apatch Software
-  Foundation product are made available under the terms of the Common Public
-  License v1.0 which accompanies this distribution, and is available
-  at cpl-v10.html.
-
-  Please read the different LICENSE files present in the root directory of
-  this distribution.
+  Apache License Version 2.0
