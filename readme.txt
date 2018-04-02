@@ -75,7 +75,7 @@ Eclipse は日本語化しても Java 標準 API のメソッドなどにマウ�
       リを指定することで設定画面にデフォルトのファイル名が初期値としてセットされ
       ます。
 
-        例）java -jar -Dtarget.directory=C:\Java mergedoc.jar
+        例）java -jar -Dtarget.directory=C:\Java mergejdoc.jar
 
       API ドキュメントは JDK インストールディレクトリ内に配置しておくことをお勧
       めします。このオプションにより API ドキュメントディレクトリも検出されます。
@@ -185,7 +185,7 @@ Eclipse で使用する場合の設定
       コードの改行情報が欠落し 1 行になっています。これはブラウザで確認すること
       ができます。
 
-      今のところ MergeDoc では元の Java ソース <pre> タグ内容を使用することで
+      今のところ MergeJDoc では元の Java ソース <pre> タグ内容を使用することで
       この問題を回避しています。
 
 

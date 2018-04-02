@@ -8,8 +8,8 @@
     <property name="bindir" value="./bin" />
     <property name="libdir" value="./lib" />
     <property name="dstdir" value="." />
-    <property name="jarfile" value="${dstdir}/mergedoc.jar" />
-    <property name="zipfile" value="${dstdir}/mergedoc.zip" />
+    <property name="jarfile" value="${dstdir}/mergejdoc.jar" />
+    <property name="zipfile" value="${dstdir}/mergejdoc.zip" />
 
     <path id="class.path">
         <fileset dir="${libdir}" includes="**/*.jar" />
@@ -31,7 +31,7 @@
         <!-- 実行 JAR 作成 -->
         <jar destfile="${jarfile}" basedir="${bindir}">
             <manifest>
-                <attribute name="Main-Class" value="mergedoc.Application" />
+                <attribute name="Main-Class" value="mergejdoc.Application" />
                 <attribute name="Class-Path"
                 	value="./conf/ ./lib/ant.jar ./lib/log4j-api-2.7.jar ./lib/log4j-core-2.7.jar ./lib/jsoup-1.10.1.jar" />
             </manifest>
@@ -41,7 +41,7 @@
         <delete file="${zipfile}" />
         <zip destfile="${zipfile}"
              basedir="${dstdir}"
-             excludes="**/mergedoc.properties" />
+             excludes="**/mergejdoc.properties" />
 
     </target>
 

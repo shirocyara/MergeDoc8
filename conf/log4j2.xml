@@ -8,7 +8,7 @@
 	</Appenders>
 	<!-- パッケージごとにAppenderとログレベルを組み合わせる -->
 	<Loggers>
-		<Logger name="mergedoc" level="warn"/>
+		<Logger name="mergejdoc" level="warn"/>
 		<root level="warn">
 			<appender-ref ref="STDERR" />
 		</root>

@@ -14,7 +14,7 @@
 
 		置換定義ファイルの配置
 
-		mergedoc.jarがあるディレクトリ
+		mergejdoc.jarがあるディレクトリ
 		|
 		|--conf/
 		| |
